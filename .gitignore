@@ -13,7 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-venv/
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -24,3 +23,7 @@ venv/
 *.sln
 *.sw?
 .env
+node_modules/
+.env
+.DS_Store
+*.log
