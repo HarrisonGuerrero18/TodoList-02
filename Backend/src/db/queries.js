@@ -1,5 +1,5 @@
 // src/db/queries.js
-import pool from "./connection.js"; // tu pool de conexión de PostgreSQL
+import { pool } from "./connection.js"; // Cambiar esta línea
 
 // ======= USUARIOS =======
 
