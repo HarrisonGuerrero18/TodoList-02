@@ -12,10 +12,10 @@ export default function Login() {
     e.preventDefault();
 
     if (!username.trim() || !contrasenia.trim()) {
-      return; // El AuthContext se encarga del toast si quieres agregarlo
+      return; 
     }
 
-    await login(username, contrasenia);
+    await login(username, contrasenia); // Línea señalada como error en la consola del navegador al iniciar sesión
   };
 
   return (
@@ -28,10 +28,10 @@ export default function Login() {
 
         <label className="font-semibold" htmlFor="username">
           Username:
-        </label>
+        </label> 
         <input
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)} 
           className="border border-gray-300 rounded p-2"
           type="text"
           id="username"

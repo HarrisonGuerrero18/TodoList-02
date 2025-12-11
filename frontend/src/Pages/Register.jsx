@@ -15,7 +15,7 @@ export default function Register() {
       return;
     }
 
-    await register({ nombre, username, contrasenia });
+    await register({ nombre, username, contrasenia }); {/*Línea señalada como error en la consola del navegador al registrarme*/}
   };
 
   return (
@@ -28,7 +28,7 @@ export default function Register() {
 
         <label className="font-semibold">Nombre completo:</label>
         <input
-          value={nombre}
+          value={nombre} 
           onChange={(e) => setNombre(e.target.value)}
           className="border border-gray-300 rounded p-2"
           type="text"

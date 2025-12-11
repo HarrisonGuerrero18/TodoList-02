@@ -21,8 +21,8 @@ export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} /> {/*Línea señalada como error en la consola del navegador al iniciar sesión*/}
+        <Route path="/register" element={<Register />} /> {/*Línea señalada como error en la consola del navegador al registrarme*/}
         <Route
           path="/todo-list"
           element={

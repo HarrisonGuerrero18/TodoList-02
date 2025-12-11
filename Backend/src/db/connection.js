@@ -8,7 +8,7 @@ export const pool = new Pool({
   password: process.env.PASSWORDDB || "",
   database: process.env.DB || "railway",
   port: parseInt(process.env.PORTDB || "5432"),
-  // Configuración SSL para Railway
+  // Configuración SSL: Solo en producción (Railway requiere SSL)
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   // Timeouts y configuración de conexión
   max: 20,
@@ -39,11 +39,19 @@ export async function testConnection() {
     console.log("✅ Conexión exitosa a PostgreSQL en", process.env.HOSTDB);
     console.log("   Base de datos:", process.env.DB);
     console.log("   Usuario:", process.env.USERDB);
+    console.log("   Puerto:", process.env.PORTDB);
   } catch (err) {
-    console.error("❌ Error conectando a la base de datos:", err.message);
+    console.error("❌ Error conectando a la base de datos:");
+    console.error("   Mensaje:", err.message);
     console.error("   Host:", process.env.HOSTDB);
     console.error("   Puerto:", process.env.PORTDB);
     console.error("   Base de datos:", process.env.DB);
     console.error("   Usuario:", process.env.USERDB);
+    
+    if (err.message.includes("password authentication failed")) {
+      console.error("   → Verifica tu contraseña en PASSWORDDB");
+    } else if (err.message.includes("connect ECONNREFUSED")) {
+      console.error("   → PostgreSQL no está corriendo o el host/puerto son incorrectos");
+    }
   }
 }
