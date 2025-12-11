@@ -2,35 +2,43 @@ import * as AuthService from "../services/auth.service.js";
 
 export async function register(req, res) {
   try {
-    const { username, email, password } = req.body;
+    const { nombre, username, contrasenia } = req.body;
 
-    const user = await AuthService.registerUser({ username, email, password });
+    // Validar que los campos requeridos estén presentes
+    if (!nombre || !username || !contrasenia) {
+      return res.status(400).json({ 
+        error: "Faltan campos requeridos: nombre, username, contrasenia" 
+      });
+    }
 
-    res.json({
+    const user = await AuthService.registerUser({ nombre, username, contrasenia });
+
+    return res.json({
       message: "Usuario registrado con éxito",
-      user: { id: user.id, username: user.username, email: user.email }
+      user
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error en registro:", err.message);
+    return res.status(400).json({ error: err.message });
   }
 }
 
 export async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { username, contrasenia } = req.body;
 
-    const data = await AuthService.loginUser({ email, password });
+    // Validar que los campos requeridos estén presentes
+    if (!username || !contrasenia) {
+      return res.status(400).json({ 
+        error: "Faltan campos requeridos: username, contrasenia" 
+      });
+    }
 
-    res.json({
-      message: "Login exitoso",
-      token: data.token,
-      user: {
-        id: data.user.id,
-        username: data.user.username,
-        email: data.user.email
-      }
-    });
+    const data = await AuthService.loginUser({ username, contrasenia });
+
+    return res.json(data);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error en login:", err.message);
+    return res.status(400).json({ error: err.message });
   }
 }

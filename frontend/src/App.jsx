@@ -1,18 +1,40 @@
-import { useAuth } from "./context/AuthContext";
-import ToDoList from "./components/ToDoList";
+// src/App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext.jsx";
+import Login from "./Pages/Login.jsx";
+import ToDoList from "./components/ToDoList.jsx";
+import { ToastContainer } from "react-toastify";
+import Register from "./Pages/Register.jsx";
 
+// ==========================
+//  RUTA PROTEGIDA
+// ==========================
+function PrivateRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+}
+
+// ==========================
+//  APP PRINCIPAL
+// ==========================
 export default function App() {
-  const { logout } = useAuth();
-
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <button
-        className="bg-red-500 text-white px-4 py-2 rounded"
-        onClick={logout}
-      >
-        logout
-      </button>
-      <ToDoList />
-    </div>
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/todo-list"
+          element={
+            <PrivateRoute>
+              <ToDoList />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+
+      <ToastContainer position="top-center" />
+    </>
   );
 }

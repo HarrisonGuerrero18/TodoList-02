@@ -1,83 +1,51 @@
-// src/services/task.service.js
 import { pool } from "../db/connection.js";
 
-export async function getTasks(userId) {
+export async function getTasks(usuario_id) {
   const result = await pool.query(
-    "SELECT * FROM tareas WHERE usuario_id = $1 ORDER BY created_at DESC",
-    [userId]
+    "SELECT * FROM tarea WHERE usuario_id = $1 ORDER BY creado_en DESC",
+    [usuario_id]
   );
   return result.rows;
 }
 
-export async function createTask(userId, { title, description }) {
+export async function createTask(usuario_id, { titulo, completada }) {
   const result = await pool.query(
-    `INSERT INTO tareas (titulo, descripcion, usuario_id)
-     VALUES ($1, $2, $3) RETURNING *`,
-    [title, description, userId]
+    `INSERT INTO tarea (usuario_id, titulo, completada, creado_en, actualizada_en)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [usuario_id, titulo, completada ?? false, new Date(), new Date()]
   );
   return result.rows[0];
 }
 
-export async function updateTask(userId, taskId, data) {
-  // Validar que la tarea es del usuario
-  const taskQuery = await pool.query(
-    "SELECT * FROM tareas WHERE id = $1",
-    [Number(taskId)]
-  );
+export async function updateTask(usuario_id, tarea_id, { titulo, completada }) {
+  // Validar dueño
+  const q = await pool.query("SELECT * FROM tarea WHERE tarea_id = $1", [tarea_id]);
+  const task = q.rows[0];
 
-  const task = taskQuery.rows[0];
-
-  if (!task || task.usuario_id !== userId) {
+  if (!task || task.usuario_id !== usuario_id) {
     throw new Error("No tienes permiso para modificar esta tarea");
   }
 
-  // Construir la consulta de actualización dinámicamente
-  const updates = [];
-  const values = [];
-  let paramCounter = 1;
-
-  if (data.title !== undefined) {
-    updates.push(`titulo = $${paramCounter}`);
-    values.push(data.title);
-    paramCounter++;
-  }
-
-  if (data.description !== undefined) {
-    updates.push(`descripcion = $${paramCounter}`);
-    values.push(data.description);
-    paramCounter++;
-  }
-
-  if (data.completed !== undefined) {
-    updates.push(`completada = $${paramCounter}`);
-    values.push(data.completed);
-    paramCounter++;
-  }
-
-  values.push(Number(taskId));
-
   const result = await pool.query(
-    `UPDATE tareas SET ${updates.join(", ")} WHERE id = $${paramCounter} RETURNING *`,
-    values
+    `UPDATE tarea 
+     SET titulo=$1, completada=$2, actualizada_en=$3
+     WHERE tarea_id=$4
+     RETURNING *`,
+    [titulo, completada, new Date(), tarea_id]
   );
 
   return result.rows[0];
 }
 
-export async function deleteTask(userId, taskId) {
-  // Validar que la tarea es del usuario
-  const taskQuery = await pool.query(
-    "SELECT * FROM tareas WHERE id = $1",
-    [Number(taskId)]
-  );
+export async function deleteTask(usuario_id, tarea_id) {
+  const q = await pool.query("SELECT * FROM tarea WHERE tarea_id = $1", [tarea_id]);
+  const task = q.rows[0];
 
-  const task = taskQuery.rows[0];
-
-  if (!task || task.usuario_id !== userId) {
+  if (!task || task.usuario_id !== usuario_id) {
     throw new Error("No tienes permiso para borrar esta tarea");
   }
 
-  await pool.query("DELETE FROM tareas WHERE id = $1", [Number(taskId)]);
-
-  return { message: "Tarea eliminada exitosamente" };
+  await pool.query("DELETE FROM tarea WHERE tarea_id = $1", [tarea_id]);
+  return { message: "Tarea eliminada" };
 }

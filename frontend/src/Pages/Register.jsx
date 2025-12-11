@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
+  const [nombre, setNombre] = useState("");
   const [username, setUsername] = useState("");
   const [contrasenia, setContrasenia] = useState("");
 
-  const { login, loading } = useAuth();
+  const { register, loading } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!username.trim() || !contrasenia.trim()) {
-      return; // El AuthContext se encarga del toast si quieres agregarlo
+    if (!nombre.trim() || !username.trim() || !contrasenia.trim()) {
+      return;
     }
 
-    await login(username, contrasenia);
+    await register({ nombre, username, contrasenia });
   };
 
   return (
@@ -24,44 +24,40 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 max-w-sm mx-auto mt-10"
       >
-        <h2 className="text-2xl font-bold text-center">LOGIN PAGE</h2>
+        <h2 className="text-2xl font-bold text-center">REGISTRO</h2>
 
-        <label className="font-semibold" htmlFor="username">
-          Username:
-        </label>
+        <label className="font-semibold">Nombre completo:</label>
+        <input
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          className="border border-gray-300 rounded p-2"
+          type="text"
+        />
+
+        <label className="font-semibold">Username:</label>
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="border border-gray-300 rounded p-2"
           type="text"
-          id="username"
         />
 
-        <label className="font-semibold" htmlFor="contrasenia">
-          Contraseña:
-        </label>
+        <label className="font-semibold">Contraseña:</label>
         <input
           value={contrasenia}
           onChange={(e) => setContrasenia(e.target.value)}
           className="border border-gray-300 rounded p-2"
           type="password"
-          id="contrasenia"
         />
 
         <button
           disabled={loading}
-          className="bg-blue-500 text-white rounded p-2 disabled:bg-blue-300"
+          className="bg-green-500 text-white rounded p-2 disabled:bg-green-300"
           type="submit"
         >
-          {loading ? "Cargando..." : "Login"}
+          {loading ? "Creando..." : "Registrarse"}
         </button>
       </form>
-
-      <div className="text-center mt-4">
-        <Link to="/register" className="text-blue-500 underline">
-          ¿No tienes cuenta? Regístrate
-        </Link>
-      </div>
     </div>
   );
 }

@@ -1,57 +1,69 @@
-// src/services/auth.service.js
 import { pool } from "../db/connection.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export async function registerUser({ username, email, password }) {
-  // Verificar si ya existe el usuario
-  const existsQuery = await pool.query(
-    "SELECT * FROM usuarios WHERE email = $1 OR username = $2",
-    [email, username]
-  );
+export async function registerUser({ nombre, username, contrasenia }) {
+  try {
+    // Validar que los campos no estén vacíos
+    if (!nombre?.trim() || !username?.trim() || !contrasenia?.trim()) {
+      throw new Error("Todos los campos son requeridos y no pueden estar vacíos");
+    }
 
-  if (existsQuery.rows.length > 0) {
-    throw new Error("El usuario o correo ya está registrado");
+    const existsQuery = await pool.query(
+      "SELECT * FROM usuario WHERE username = $1",
+      [username]
+    );
+
+    if (existsQuery.rows.length > 0) {
+      throw new Error("El usuario ya está registrado");
+    }
+
+    const hashed = await bcrypt.hash(contrasenia, 10);
+
+    const result = await pool.query(
+      `INSERT INTO usuario (nombre, username, contrasenia, creado_en)
+       VALUES ($1, $2, $3, $4)
+       RETURNING usuario_id, nombre, username`,
+      [nombre, username, hashed, new Date()]
+    );
+
+    return result.rows[0];
+  } catch (err) {
+    console.error("Error en registerUser:", err.message);
+    throw err;
   }
-
-  // Encriptar contraseña
-  const hashed = await bcrypt.hash(password, 10);
-
-  // Crear usuario
-  const result = await pool.query(
-    `INSERT INTO usuarios (username, email, password)
-     VALUES ($1, $2, $3) RETURNING id, username, email, created_at`,
-    [username, email, hashed]
-  );
-
-  return result.rows[0];
 }
 
-export async function loginUser({ email, password }) {
-  // Buscar usuario por email
-  const result = await pool.query(
-    "SELECT * FROM usuarios WHERE email = $1",
-    [email]
-  );
+export async function loginUser({ username, contrasenia }) {
+  try {
+    // Validar que los campos no estén vacíos
+    if (!username?.trim() || !contrasenia?.trim()) {
+      throw new Error("Username y contraseña son requeridos");
+    }
 
-  const user = result.rows[0];
+    const result = await pool.query(
+      "SELECT * FROM usuario WHERE username = $1",
+      [username]
+    );
 
-  if (!user) throw new Error("Credenciales incorrectas");
+    const user = result.rows[0];
 
-  // Verificar contraseña
-  const match = await bcrypt.compare(password, user.password);
+    if (!user) throw new Error("Credenciales incorrectas");
 
-  if (!match) throw new Error("Credenciales incorrectas");
+    const match = await bcrypt.compare(contrasenia, user.contrasenia);
+    if (!match) throw new Error("Credenciales incorrectas");
 
-  // Crear token
-  const token = jwt.sign(
-    { id: user.id },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+    const token = jwt.sign(
+      { id: user.usuario_id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-  // Remover password del objeto user antes de devolverlo
-  const { password: _, ...userWithoutPassword } = user;
+    delete user.contrasenia;
 
-  return { user: userWithoutPassword, token };
+    return { user, token };
+  } catch (err) {
+    console.error("Error en loginUser:", err.message);
+    throw err;
+  }
 }
