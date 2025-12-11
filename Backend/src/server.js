@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import taskRoutes from "./routes/tasks.routes.js";
 import { authMiddleware } from "./middleware/auth.js";
+import { testConnection } from "./db/connection.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,8 @@ app.get("/", (req, res) => res.send("API OK"));
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  // Pruebar la conexión a la BD después de que el servidor esté escuchando
+  testConnection();
 });
 
 export default app;

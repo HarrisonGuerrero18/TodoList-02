@@ -16,26 +16,34 @@ export const pool = new Pool({
   connectionTimeoutMillis: 10000,
 });
 
-// Validar variables de entorno
-if (!process.env.HOSTDB || !process.env.USERDB || !process.env.DB) {
-  console.warn("⚠️ Advertencia: Faltan variables de entorno para la base de datos");
-  console.warn("Asegúrate de configurar: HOSTDB, USERDB, DB, PASSWORDDB, PORTDB");
-}
-
 // Manejar errores del pool
 pool.on("error", (err) => {
   console.error("❌ Error en el pool de conexión:", err.message);
 });
 
-// Prueba de conexión al iniciar
-pool.query("SELECT NOW()", (err, res) => {
-  if (err) {
+// Validar variables de entorno - SOLO después de que dotenv haya cargado
+export async function testConnection() {
+  if (!process.env.HOSTDB || !process.env.USERDB || !process.env.DB) {
+    console.warn("⚠️ Advertencia: Faltan variables de entorno para la base de datos");
+    console.warn("Configura en Railway o en tu .env local:");
+    console.warn("   - HOSTDB");
+    console.warn("   - USERDB");
+    console.warn("   - DB");
+    console.warn("   - PASSWORDDB");
+    console.warn("   - PORTDB");
+    return;
+  }
+
+  try {
+    const result = await pool.query("SELECT NOW()");
+    console.log("✅ Conexión exitosa a PostgreSQL en", process.env.HOSTDB);
+    console.log("   Base de datos:", process.env.DB);
+    console.log("   Usuario:", process.env.USERDB);
+  } catch (err) {
     console.error("❌ Error conectando a la base de datos:", err.message);
     console.error("   Host:", process.env.HOSTDB);
     console.error("   Puerto:", process.env.PORTDB);
     console.error("   Base de datos:", process.env.DB);
-  } else {
-    console.log("✅ Conexión exitosa a PostgreSQL en", process.env.HOSTDB);
-    console.log("   Base de datos:", process.env.DB);
+    console.error("   Usuario:", process.env.USERDB);
   }
-});
+}
