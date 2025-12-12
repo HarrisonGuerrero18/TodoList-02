@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../api/config";
 
 export function useTasks() {
   const { token } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API = "http://localhost:3000/tasks";
+  const API = `${API_URL}/tasks`;
 
   useEffect(() => {
     async function load() {
