@@ -22,11 +22,17 @@ export async function create(req, res) {
 
 export async function update(req, res) {
   try {
-    const task = await TaskService.updateTask(req.usuario_id, req.params.id, req.body);
+    const task = await TaskService.updateTask(
+      req.usuario_id,
+      req.params.id,
+      req.body
+    );
     res.json(task);
-  } console.error("Error en update:", err.message);
-    res.status(err.message.includes("permiso") ? 403 :  {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    console.error("Error en update:", err.message);
+    res
+      .status(err.message.includes("permiso") ? 403 : 400)
+      .json({ error: err.message });
   }
 }
 
@@ -34,8 +40,10 @@ export async function remove(req, res) {
   try {
     await TaskService.deleteTask(req.usuario_id, req.params.id);
     res.json({ message: "Tarea eliminada" });
-  } console.error("Error en remove:", err.message);
-    res.status(err.message.includes("permiso") ? 403 :  {
-    res.status(400).json({ error: err.message });
+  } catch (err) {
+    console.error("Error en remove:", err.message);
+    res
+      .status(err.message.includes("permiso") ? 403 : 400)
+      .json({ error: err.message });
   }
 }

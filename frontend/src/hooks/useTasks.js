@@ -9,23 +9,26 @@ export function useTasks() {
 
   const API = `${API_URL}/tasks`;
 
+  // ==============================
+  // CARGAR TAREAS
+  // ==============================
   useEffect(() => {
     if (!token) {
       setLoading(false);
       return;
     }
-    
+
     async function load() {
       try {
         const res = await fetch(API, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
+
         if (!res.ok) {
           const error = await res.json();
           throw new Error(error.error || `Error ${res.status}`);
         }
-        
+
         const data = await res.json();
         setTasks(data || []);
       } catch (err) {
@@ -35,9 +38,13 @@ export function useTasks() {
         setLoading(false);
       }
     }
+
     load();
   }, [token, API]);
 
+  // ==============================
+  // AGREGAR TAREA
+  // ==============================
   async function add(titulo) {
     try {
       const res = await fetch(API, {
@@ -61,6 +68,9 @@ export function useTasks() {
     }
   }
 
+  // ==============================
+  // TOGGLE (COMPLETADA)
+  // ==============================
   async function toggle(id, completada) {
     try {
       const res = await fetch(`${API}/${id}`, {
@@ -79,6 +89,17 @@ export function useTasks() {
 
       const updated = await res.json();
       setTasks((prev) =>
+        prev.map((t) => (t.tarea_id === id ? updated : t))
+      );
+    } catch (err) {
+      console.error("Error actualizando estado:", err);
+    }
+  }
+
+  // ==============================
+  // ACTUALIZAR TÍTULO
+  // ==============================
+  async function update(id, titulo) {
     try {
       const res = await fetch(`${API}/${id}`, {
         method: "PUT",
@@ -100,10 +121,13 @@ export function useTasks() {
       );
     } catch (err) {
       console.error("Error actualizando tarea:", err);
-    }},
-      body: JSON.stringify({ titulo }),
-    });
+    }
+  }
 
+  // ==============================
+  // ELIMINAR TAREA
+  // ==============================
+  async function remove(id) {
     try {
       const res = await fetch(`${API}/${id}`, {
         method: "DELETE",
@@ -119,14 +143,6 @@ export function useTasks() {
     } catch (err) {
       console.error("Error eliminando tarea:", err);
     }
-
-  async function remove(id) {
-    await fetch(`${API}/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setTasks((prev) => prev.filter((t) => t.tarea_id !== id));
   }
 
   return {
