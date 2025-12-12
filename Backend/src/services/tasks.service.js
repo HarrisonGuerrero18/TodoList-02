@@ -2,7 +2,7 @@ import { pool } from "../db/connection.js";
 
 export async function getTasks(usuario_id) {
   const result = await pool.query(
-    "SELECT * FROM tarea WHERE usuario_id = $1 ORDER BY creado_en DESC",
+    "SELECT * FROM tarea WHERE usuario_id = $1 ORDER BY creada_en DESC",
     [usuario_id]
   );
   return result.rows;
@@ -14,10 +14,10 @@ export async function createTask(usuario_id, { titulo, completada }) {
   }
 
   const result = await pool.query(
-    `INSERT INTO tarea (usuario_id, titulo, completada, creado_en, actualizada_en)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO tarea (usuario_id, titulo, completada, actualizada_en)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [usuario_id, titulo.trim(), completada ?? false, new Date(), new Date()]
+    [usuario_id, titulo.trim(), completada ?? false, new Date()]
   );
   return result.rows[0];
 }
