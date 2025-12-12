@@ -20,10 +20,17 @@ export function useTasks() {
         const res = await fetch(API, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error || `Error ${res.status}`);
+        }
+        
         const data = await res.json();
-        setTasks(data);
+        setTasks(data || []);
       } catch (err) {
         console.error("Error cargando tareas:", err);
+        setTasks([]);
       } finally {
         setLoading(false);
       }
@@ -32,52 +39,86 @@ export function useTasks() {
   }, [token, API]);
 
   async function add(titulo) {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ titulo }),
-    });
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ titulo }),
+      });
 
-    const newTask = await res.json();
-    setTasks((prev) => [newTask, ...prev]);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || `Error ${res.status}`);
+      }
+
+      const newTask = await res.json();
+      setTasks((prev) => [newTask, ...prev]);
+    } catch (err) {
+      console.error("Error agregando tarea:", err);
+    }
   }
 
   async function toggle(id, completada) {
-    const res = await fetch(`${API}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ completada }),
-    });
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ completada }),
+      });
 
-    const updated = await res.json();
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || `Error ${res.status}`);
+      }
 
-    setTasks((prev) =>
-      prev.map((t) => (t.tarea_id === id ? updated : t))
-    );
-  }
+      const updated = await res.json();
+      setTasks((prev) =>
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ titulo }),
+      });
 
-  async function update(id, titulo) {
-    const res = await fetch(`${API}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || `Error ${res.status}`);
+      }
+
+      const updated = await res.json();
+      setTasks((prev) =>
+        prev.map((t) => (t.tarea_id === id ? updated : t))
+      );
+    } catch (err) {
+      console.error("Error actualizando tarea:", err);
+    }},
       body: JSON.stringify({ titulo }),
     });
 
-    const updated = await res.json();
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setTasks((prev) =>
-      prev.map((t) => (t.tarea_id === id ? updated : t))
-    );
-  }
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || `Error ${res.status}`);
+      }
+
+      setTasks((prev) => prev.filter((t) => t.tarea_id !== id));
+    } catch (err) {
+      console.error("Error eliminando tarea:", err);
+    }
 
   async function remove(id) {
     await fetch(`${API}/${id}`, {

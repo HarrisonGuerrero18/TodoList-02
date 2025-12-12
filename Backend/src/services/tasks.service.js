@@ -9,11 +9,15 @@ export async function getTasks(usuario_id) {
 }
 
 export async function createTask(usuario_id, { titulo, completada }) {
+  if (!titulo || !titulo.trim()) {
+    throw new Error("El título de la tarea es requerido");
+  }
+
   const result = await pool.query(
     `INSERT INTO tarea (usuario_id, titulo, completada, creado_en, actualizada_en)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [usuario_id, titulo, completada ?? false, new Date(), new Date()]
+    [usuario_id, titulo.trim(), completada ?? false, new Date(), new Date()]
   );
   return result.rows[0];
 }
@@ -27,12 +31,17 @@ export async function updateTask(usuario_id, tarea_id, { titulo, completada }) {
     throw new Error("No tienes permiso para modificar esta tarea");
   }
 
+  // Validar que al menos un campo sea actualizado
+  if (!titulo && completada === undefined) {
+    throw new Error("Debes proporcionar un título o estado de completitud");
+  }
+
   const result = await pool.query(
     `UPDATE tarea 
-     SET titulo=$1, completada=$2, actualizada_en=$3
+     SET titulo=COALESCE($1, titulo), completada=COALESCE($2, completada), actualizada_en=$3
      WHERE tarea_id=$4
      RETURNING *`,
-    [titulo, completada, new Date(), tarea_id]
+    [titulo ? titulo.trim() : null, completada, new Date(), tarea_id]
   );
 
   return result.rows[0];

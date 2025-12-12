@@ -15,7 +15,7 @@ export default function Login() {
       return; 
     }
 
-    await login(username, contrasenia); // Línea señalada como error en la consola del navegador al iniciar sesión
+    await login(username, contrasenia);
   };
 
   return (

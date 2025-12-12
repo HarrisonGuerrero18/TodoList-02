@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
   const login = async (username, contrasenia) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/auth/login`, { // Esta línea es la que aparece como error en la consola del navegador al iniciar sesión
+      const res = await fetch(`${API}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, contrasenia }),
@@ -52,14 +52,14 @@ export function AuthProvider({ children }) {
   const register = async ({ nombre, username, contrasenia }) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/auth/register`, {  // Esta línea es la que aparece como error en la consola del navegador al registrarme
+      const res = await fetch(`${API}/auth/register`, {  
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre, username, contrasenia }),
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Error registrando usuario"); // Este mensaje se está mostrando en pantalla al dar click en registrar 
+        toast.error(data.error || "Error registrando usuario"); 
         return;
       }
       toast.success("Registro exitoso. Inicia sesión.");

@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App /> {/*Línea señalada como error en la consola del navegador al iniciar sesión*/}
+        <App />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

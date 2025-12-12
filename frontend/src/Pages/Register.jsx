@@ -15,7 +15,7 @@ export default function Register() {
       return;
     }
 
-    await register({ nombre, username, contrasenia }); {/*Línea señalada como error en la consola del navegador al registrarme*/}
+    await register({ nombre, username, contrasenia })
   };
 
   return (
