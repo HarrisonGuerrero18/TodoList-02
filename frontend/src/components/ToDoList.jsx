@@ -1,13 +1,16 @@
 import { useRef, useState } from "react";
 import { useTasks } from "../hooks/useTasks";
+import { useAuth } from "../context/AuthContext";
 import "../index.css";
 import { FaTrashAlt } from "react-icons/fa";
 import { GrUpdate } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaReact } from "react-icons/fa";
+import { MdLogout } from "react-icons/md";
 
 export default function ToDoList() {
   const { tasks, loading, add, toggle, remove, update } = useTasks();
+  const { user, logout } = useAuth();
   const [newTask, setNewTask] = useState("");
   const inputRef = useRef(null);
 
@@ -23,9 +26,23 @@ export default function ToDoList() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-4 bg-gray-100 shadow-md rounded-lg">
-      <a href="https://es.react.dev/" target="_blank" rel="noopener noreferrer">
-        <FaReact className="text-4xl mb-4 mx-auto cursor-pointer hover:scale-110" />
-      </a>
+      {/* Header con botón de logout */}
+      <div className="flex items-center justify-between mb-4">
+        <a href="https://es.react.dev/" target="_blank" rel="noopener noreferrer">
+          <FaReact className="text-4xl cursor-pointer hover:scale-110" />
+        </a>
+        <div className="text-right">
+          <p className="text-sm font-semibold text-gray-700">
+            {user?.nombre || user?.username}
+          </p>
+          <button
+            onClick={logout}
+            className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-semibold mt-1"
+          >
+            <MdLogout /> Cerrar sesión
+          </button>
+        </div>
+      </div>
 
       <h1 className="text-xl font-semibold mb-4 text-center uppercase font-sans">
         Lista de Tareas

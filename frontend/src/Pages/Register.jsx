@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
+import { Link } from "react-router-dom";
 
 export default function Register() {
   const [nombre, setNombre] = useState("");
@@ -15,7 +16,7 @@ export default function Register() {
       return;
     }
 
-    await register({ nombre, username, contrasenia })
+    await register({ nombre, username, contrasenia });
   };
 
   return (
@@ -28,7 +29,7 @@ export default function Register() {
 
         <label className="font-semibold">Nombre completo:</label>
         <input
-          value={nombre} 
+          value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           className="border border-gray-300 rounded p-2"
           type="text"
@@ -58,6 +59,12 @@ export default function Register() {
           {loading ? "Creando..." : "Registrarse"}
         </button>
       </form>
+
+      <div className="text-center mt-4">
+        <Link to="/login" className="text-blue-500 underline">
+          ¿Ya tienes cuenta? Inicia sesión
+        </Link>
+      </div>
     </div>
   );
 }
