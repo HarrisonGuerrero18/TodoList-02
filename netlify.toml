@@ -2,3 +2,12 @@
   base = "frontend"
   command = "npm run build"
   publish = "dist"
+
+[context.production.environment]
+  VITE_API_URL = "https://todolist-02-production.up.railway.app"
+
+[context.develop.environment]
+  VITE_API_URL = "http://localhost:3000"
+
+[context.branch-deploy.environment]
+  VITE_API_URL = "http://localhost:3000"
