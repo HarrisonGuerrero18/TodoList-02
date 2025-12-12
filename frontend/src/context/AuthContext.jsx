@@ -6,12 +6,14 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
       setUser({ username: "Usuario autenticado" });
     }
   }, []);
@@ -36,6 +38,7 @@ export function AuthProvider({ children }) {
         return;
       }
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       setUser(data.user);
       toast.success("Login exitoso");
       navigate("/todo-list");
@@ -73,16 +76,18 @@ export function AuthProvider({ children }) {
   // =========================
   const logout = () => {
     localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
     navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
 
 export function useAuth() {
   return useContext(AuthContext);

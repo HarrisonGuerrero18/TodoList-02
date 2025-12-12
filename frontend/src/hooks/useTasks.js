@@ -10,6 +10,11 @@ export function useTasks() {
   const API = `${API_URL}/tasks`;
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    
     async function load() {
       try {
         const res = await fetch(API, {
@@ -24,7 +29,7 @@ export function useTasks() {
       }
     }
     load();
-  }, []);
+  }, [token, API]);
 
   async function add(titulo) {
     const res = await fetch(API, {
